@@ -216,6 +216,17 @@ function bot(app: Probot) {
       String(privateInstallationId.data.id),
     )
 
+    botLogger.info('sending syncRepos request', {
+      forkBranchName: mirrorName,
+      mirrorBranchName: branch,
+      destinationTo: 'fork',
+      forkName,
+      forkOwner,
+      mirrorName,
+      mirrorOwner,
+      orgId,
+    })
+
     const res = await serverTrpc.syncRepos
       .mutate({
         accessToken: privateAccessToken,
