@@ -1,7 +1,11 @@
 import { checkGitHubAppInstallationAuth, checkGitHubAuth } from './auth'
 import { Middleware } from './trpc-server'
+import { logger } from './logger'
+
+const trpcMiddlewareLogger = logger.getSubLogger({ name: 'trpcMiddleware' })
 
 export const verifyGitHubAppAuth: Middleware = async (opts) => {
+  trpcMiddlewareLogger.info('Verifying GitHub App authentication in middleware')
   const { ctx, rawInput } = opts
 
   // Check app authentication

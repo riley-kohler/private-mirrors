@@ -14,7 +14,7 @@ export const syncReposHandler = async ({
 }: {
   input: SyncReposSchema
 }) => {
-  gitApiLogger.info('Received syncRepos request')
+  gitApiLogger.info('Received syncRepos request in handler')
   try {
     gitApiLogger.info('Syncing repos', { ...input, accessToken: 'none' })
 

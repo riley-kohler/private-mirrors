@@ -36,6 +36,8 @@ export const checkGitHubAppInstallationAuth = async (
   mirrorOrgOwner: string | undefined,
   mirrorRepo: string | undefined,
 ) => {
+  middlewareLogger.info('Checking github app installation auth in function')
+
   if (!accessToken || !mirrorOrgOwner || !mirrorRepo) {
     middlewareLogger.error('No access token or mirror org/repo provided')
     throw new TRPCError({ code: 'UNAUTHORIZED' })

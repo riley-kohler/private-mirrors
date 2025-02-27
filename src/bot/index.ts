@@ -227,8 +227,8 @@ function bot(app: Probot) {
       orgId,
     })
 
-    const res = await serverTrpc.syncRepos
-      .mutate({
+    try {
+      const res = await serverTrpc.syncRepos.mutate({
         accessToken: privateAccessToken,
         forkBranchName: mirrorName,
         mirrorBranchName: branch,
@@ -239,31 +239,32 @@ function bot(app: Probot) {
         mirrorOwner,
         orgId,
       })
-      .catch((error: Error) => {
-        botLogger.error('Failed to sync repository', { error })
-      })
-
-    botLogger.info('Synced repository', { res })
-
-    try {
-      // Get the default branch
-      const defaultBranch = context.payload.repository.default_branch
-
-      botLogger.debug(
-        'Adding branch protections to default branch in case repo.edited did not fire',
-        {
-          defaultBranch,
-        },
-      )
-
-      await createDefaultBranchProtection(
-        context,
-        context.payload.repository.node_id,
-        authenticatedApp.data.node_id,
-        defaultBranch,
-      )
+      botLogger.info('Synced repository', { res })
     } catch (error) {
-      botLogger.error('Failed to add branch protections', { error })
+      botLogger.error('Failed to sync repository', { error })
+    }
+
+    if (process.env.CREATE_BRANCH_PROTECTIONS) {
+      try {
+        // Get the default branch
+        const defaultBranch = context.payload.repository.default_branch
+
+        botLogger.debug(
+          'Adding branch protections to default branch in case repo.edited did not fire',
+          {
+            defaultBranch,
+          },
+        )
+
+        await createDefaultBranchProtection(
+          context,
+          context.payload.repository.node_id,
+          authenticatedApp.data.node_id,
+          defaultBranch,
+        )
+      } catch (error) {
+        botLogger.error('Failed to add branch protections', { error })
+      }
     }
   })
 }
