@@ -5,6 +5,7 @@ import { appOctokit, generateAppAccessToken } from './octokit'
 import { createAllPushProtection, createDefaultBranchProtection } from './rules'
 
 import '../utils/proxy'
+import { syncReposHandler } from 'server/git/controller'
 
 type CustomProperties = Record<string, string>
 
@@ -242,6 +243,25 @@ function bot(app: Probot) {
       botLogger.info('Synced repository', { res })
     } catch (error) {
       botLogger.error('Failed to sync repository', { error })
+    }
+
+    try {
+      const res = await syncReposHandler({
+        input: {
+          accessToken: privateAccessToken,
+          forkBranchName: mirrorName,
+          mirrorBranchName: branch,
+          destinationTo: 'fork',
+          forkName,
+          forkOwner,
+          mirrorName,
+          mirrorOwner,
+          orgId,
+        },
+      })
+      botLogger.info('Synced repository 2', { res })
+    } catch (error) {
+      botLogger.error('Failed to sync repository 2', { error })
     }
 
     if (process.env.CREATE_BRANCH_PROTECTIONS) {
